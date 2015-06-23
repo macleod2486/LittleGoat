@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Little Goat</string>
+    <string name="apikey">7kM7IGFvtiq+UzgdfT8umA==</string>
+    <string name="urlbase">https://fakevout.azurewebsites.net</string>
 </resources>
