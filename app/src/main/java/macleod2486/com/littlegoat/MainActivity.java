@@ -22,17 +22,22 @@
 
 package macleod2486.com.littlegoat;
 
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import org.json.JSONObject;
@@ -47,6 +52,7 @@ public class MainActivity extends ActionBarActivity
     private DrawerLayout drawer;
     private static ListView menu;
     private VoatApi api;
+    private String requestResult = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -96,18 +102,66 @@ public class MainActivity extends ActionBarActivity
         {
             case R.id.login:
             {
-                //Login
-                DialogFragment newFragment = new LoginFragment();
-                newFragment.show(getSupportFragmentManager(), "login");
+                LayoutInflater inflater = this.getLayoutInflater();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final View view = inflater.inflate(R.layout.fragment_login, null);
+                builder.setView(view);
+                builder.setMessage("Login");
+                builder.setPositiveButton("Login", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        Log.i("LittlGoat", "Attempting login");
+
+                        EditText username = (EditText)view.findViewById(R.id.username);
+                        EditText password = (EditText)view.findViewById(R.id.password);
+
+                        requestResult = api.requestAuthtoken(username.getText().toString(),password.getText().toString());
+
+                        try
+                        {
+                            JSONObject result = new JSONObject(requestResult);
+                            String token = result.get("access_token").toString();
+                            String expiration = result.get(".expires").toString();
+
+                            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                            SharedPreferences.Editor edit = shared.edit();
+                            edit.putString("apitoken",token);
+                            edit.putString("apitokenexpiration",expiration);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.dismiss();
+                        Log.i("LittleGoat", "Cancelled by user");
+                    }
+                });
+
+                AlertDialog login = builder.create();
+
+                login.show();
 
                 return true;
             }
+
             case R.id.settings:
             {
                 //Settings
 
                 return true;
             }
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -116,14 +170,17 @@ public class MainActivity extends ActionBarActivity
     private void setup()
     {
         drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
-        drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+        drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener()
+                                 {
                                      @Override
-                                     public void onDrawerClosed(View drawerView) {
+                                     public void onDrawerClosed(View drawerView)
+                                     {
                                          Log.i("LittleGoat", "Drawer Closed");
                                      }
 
                                      @Override
-                                     public void onDrawerOpened(View drawerView) {
+                                     public void onDrawerOpened(View drawerView)
+                                     {
                                          Log.i("LittleGoat", "DrawerOpened");
                                      }
                                  }

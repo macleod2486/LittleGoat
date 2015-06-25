@@ -144,7 +144,6 @@ public class VoatApi
         {
             get.setHeader("Content-Type", "application/x-www-form-urlencoded");
             get.addHeader("Voat-ApiKey", applicationContext.getString(R.string.apikey));
-            //get.addHeader("Authorization","Bearer z9iRWujOWWXR0gU_rm5bg_cntymt4GhGxDTj0CBerFF1MGURiThcVgiTCYAMXwLqtH7ppegBgAswA_l_ZHojsGXiKsWp8KMdnhIcYt6nMRC4Gw_k8xDC6iNA77X-C6qQL812SMud6jYiORhLozPP7_WeOteFCCpO5iRcwwpET5edwVBtWmT8fTd6NfSaG0hBR6bLSfgp-11l30llnQ2qnXimhDVqpN1wfBqqGJQArCW0nTQ_RzVD4QRyMXoM2InGoxRtPLp3wJlLaekvwHcXo3jCkqMD8PS8vM0eD97pfAYzECu1D9NaoNKOckWvGvPvUXLzBczDe6JFGy86NOxWJSYpAUI5n209jCFO5lhYBtJ_gQfKD4wLoruymjZIiFDLKT7P0BM6SiiOqD9FRN5fCfkS20DAszrETvLXP6NMIzVXCYSbFpHmB9LGJffKd7zf7mx3j5au0zyT9uue3A6r3c41YQkeSzDamxbu8XaNCTs");
             get.addHeader("Authorization","Bearer "+apitoken);
 
             try
