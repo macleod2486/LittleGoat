@@ -42,7 +42,11 @@ import android.widget.ListView;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import macleod2486.com.voat.VoatApi;
 
@@ -92,6 +96,26 @@ public class MainActivity extends ActionBarActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
 
+        //Hide the login button if the token is still valid.
+        try
+        {
+            SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(this);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+
+            Date strDate = sdf.parse(shared.getString("apitokenexpiration", null));
+
+            if (!new Date().after(strDate))
+            {
+                menu.getItem(0).setVisible(false);
+            }
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -124,12 +148,19 @@ public class MainActivity extends ActionBarActivity
                         {
                             JSONObject result = new JSONObject(requestResult);
                             String token = result.get("access_token").toString();
-                            String expiration = result.get(".expires").toString();
+                            String expiration = result.get("expires_in").toString();
+
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTimeInMillis(System.currentTimeMillis());
+                            cal.add(Calendar.SECOND, Integer.parseInt(expiration));
 
                             SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                             SharedPreferences.Editor edit = shared.edit();
-                            edit.putString("apitoken",token);
-                            edit.putString("apitokenexpiration",expiration);
+                            edit.putString("apitoken", token);
+                            edit.putString("apitokenexpiration", cal.getTime().toString());
+                            edit.commit();
+
+                            Log.i("VoatAPI",cal.getTime().toString());
                         }
                         catch(Exception e)
                         {
