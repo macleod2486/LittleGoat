@@ -57,6 +57,7 @@ public class MainActivity extends ActionBarActivity
     private static ListView menu;
     private VoatApi api;
     private String requestResult = "";
+    private Menu sideMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -65,11 +66,7 @@ public class MainActivity extends ActionBarActivity
 
         setContentView(R.layout.mainlayout);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         api = new VoatApi(getApplicationContext());
-
-        setup();
     }
 
     @Override
@@ -96,6 +93,8 @@ public class MainActivity extends ActionBarActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
 
+        this.sideMenu = menu;
+
         //Hide the login button if the token is still valid.
         try
         {
@@ -107,7 +106,9 @@ public class MainActivity extends ActionBarActivity
 
             if (!new Date().after(strDate))
             {
-                menu.getItem(0).setVisible(false);
+                this.sideMenu.getItem(0).setVisible(false);
+
+                setupDrawer();
             }
 
         }
@@ -164,6 +165,7 @@ public class MainActivity extends ActionBarActivity
                         }
                         catch(Exception e)
                         {
+                            Log.e("LittlGoat", "Error in logging in.");
                             e.printStackTrace();
                         }
 
@@ -193,13 +195,28 @@ public class MainActivity extends ActionBarActivity
                 return true;
             }
 
+            case android.R.id.home:
+            {
+                if(this.drawer.isDrawerOpen(this.menu))
+                {
+                    this.drawer.closeDrawer(this.menu);
+                }
+                else
+                {
+                    this.drawer.openDrawer(this.menu);
+                }
+                return true;
+            }
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void setup()
+    private void setupDrawer()
     {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         drawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener()
                                  {
